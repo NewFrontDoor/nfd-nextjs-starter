@@ -1,11 +1,14 @@
 /** @jsx jsx */
-import {jsx} from 'theme-ui';
+import {jsx, Styled} from 'theme-ui';
 import Layout from '../components/master-layout';
-import {menuQuery, mainQuery, defaultQuery, footerQuery} from '../lib/queries';
+import {menuQuery, pageQuery, defaultQuery, footerQuery} from '../lib/queries';
+import SanityBlock from '../components/block-text-serializer';
 import {fetchQuery} from '../lib/sanity';
 import PropTypes from 'prop-types';
 
-const Home = props => {
+const Page = (props) => {
+  const {menuData, mainData, defaultData, footerData} = props;
+
   return (
     <Layout {...props}>
       <article
@@ -15,7 +18,8 @@ const Home = props => {
           padding: '15px'
         }}
       >
-        Welcome to NFD starter theme
+        <Styled.h2 sx={{textAlign: 'left'}}>{mainData.title}</Styled.h2>
+        <SanityBlock blocks={mainData.body} />
       </article>
     </Layout>
   )
@@ -23,23 +27,23 @@ const Home = props => {
 
 
 // Amend below prop-types to be PropTypes.shape({...})
-Home.propTypes = {
+Page.propTypes = {
   mainData: PropTypes.object.isRequired,
   menuData: PropTypes.object.isRequired,
   defaultData: PropTypes.object.isRequired,
   footerData: PropTypes.object.isRequired
 };
 
-Home.getInitialProps = async () => {
+Page.getInitialProps = async ({query}) => {
   const results = await fetchQuery(
     `{
-      'menuData': ${menuQuery},
-      'mainData': ${mainQuery},
-      "defaultData": ${defaultQuery},
-      'footerData': ${footerQuery}
+        "mainData": ${pageQuery(query.slug)},
+        "menuData": ${menuQuery},
+        "defaultData": ${defaultQuery},
+        "footerData": ${footerQuery}
     }`
   );
   return results;
 };
 
-export default Home;
+export default Page;
